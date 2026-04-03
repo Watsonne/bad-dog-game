@@ -11,28 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
+      - name: Build with ArtemSBulgakov buildozer action
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
         with:
-          python-version: '3.9'
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            python3-pip git zip unzip openjdk-17-jdk \
-            autoconf libtool pkg-config zlib1g-dev \
-            libncurses5-dev libncursesw5-dev libtinfo5 \
-            libffi-dev libssl-dev cmake build-essential \
-            libltdl-dev
-          pip install buildozer cython==0.29.33
-
-      - name: Build APK
-        run: buildozer -v android debug
+          command: buildozer android debug
+          buildozer_version: stable
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: bad-dog-apk
-          path: bin/*.apk
-          if-no-files-found: warn
+          path: ${{ steps.buildozer.outputs.filename }}
