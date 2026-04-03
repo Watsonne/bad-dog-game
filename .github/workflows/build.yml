@@ -6,20 +6,34 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build with ArtemSBulgakov buildozer action
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
         with:
-          command: buildozer android debug
-          buildozer_version: stable
+          python-version: '3.9'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            python3-pip git zip unzip \
+            openjdk-11-jdk autoconf libtool \
+            pkg-config zlib1g-dev libncurses5-dev \
+            libffi-dev libssl-dev cmake build-essential
+          pip install --upgrade pip
+          pip install buildozer==1.5.0 cython==0.29.33
+
+      - name: Build APK
+        run: |
+          buildozer android debug 2>&1
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: bad-dog-apk
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
+          if-no-files-found: warn
