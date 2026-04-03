@@ -23,12 +23,12 @@ jobs:
             python3-pip git zip unzip openjdk-17-jdk \
             autoconf libtool pkg-config zlib1g-dev \
             libncurses5-dev libncursesw5-dev libtinfo5 \
-            libffi-dev libssl-dev
-          pip install buildozer cython
+            libffi-dev libssl-dev cmake
+          pip install buildozer cython==0.29.33
 
-      - name: Build APK
+      - name: Build APK with Buildozer
         run: |
-          buildozer android debug 2>&1 | tail -50
+          yes | buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
